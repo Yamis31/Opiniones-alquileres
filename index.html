@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opiniones de Arrendadores y Alquileres</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .intro {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .intro img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+        }
+        .intro p {
+            font-size: 16px;
+            color: #555;
+            margin-top: 10px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select, .form-group button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .form-group input[type="file"] {
+            padding: 3px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .reviews {
+            margin-top: 30px;
+        }
+        .review {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+        .review:last-child {
+            border-bottom: none;
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .rating img {
+            width: 30px;
+            height: 30px;
+        }
+        footer {
+            margin-top: 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Opiniones de Arrendadores y Alquileres</h1>
+        <p>Comparte tu experiencia y ayuda a otros a encontrar el mejor lugar para vivir.</p>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <img src="https://via.placeholder.com/800x400.png?text=Inmobiliaria" alt="Imagen inmobiliaria">
+            <p>Bienvenido a nuestra plataforma, donde puedes compartir tus experiencias sobre los alquileres en los que has estado. Deja tu valoración, sube fotos de los lugares y ayuda a otros a encontrar su próximo hogar.</p>
+        </div>
+
+        <h2>Deja tu opinión</h2>
+        <form id="review-form">
+            <div class="form-group">
+                <label for="name">Tu nombre</label>
+                <input type="text" id="name" name="name" placeholder="Escribe tu nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="rating">Calificación</label>
+                <div class="rating" id="rating">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 1" data-index="1">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 2" data-index="2">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 3" data-index="3">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 4" data-index="4">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 5" data-index="5">
+                </div>
+                <input type="hidden" id="selected-rating" name="rating" required>
+            </div>
+            <div class="form-group">
+                <label for="opinion">Tu opinión</label>
+                <textarea id="opinion" name="opinion" rows="5" placeholder="Escribe tu opinión" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="image">Sube una foto (opcional)</label>
+                <input type="file" id="image" name="image">
+            </div>
+            <button type="submit" class="btn">Enviar opinión</button>
+        </form>
+
+        <div class="reviews">
+            <h2>Opiniones recientes</h2>
+            <div id="reviews-container">
+                <!-- Las opiniones aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Opiniones de Alquileres. Todos los derechos reservados. <a href="#">Política de privacidad</a></p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('review-form');
+        const reviewsContainer = document.getElementById('reviews-container');
+        const ratingStars = document.querySelectorAll('.rating img');
+        const selectedRatingInput = document.getElementById('selected-rating');
+        
+        let selectedRating = 0;
+        
+        // Manejar el click en las estrellas para la calificación
+        ratingStars.forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.getAttribute('data-index'));
+                updateRatingStars(selectedRating);
+                selectedRatingInput.value = selectedRating; // Almacenar la calificación seleccionada
+            });
+        });
+
+        function updateRatingStars(rating) {
+            ratingStars.forEach((star, index) => {
+                if (index < rating) {
+                    star.src = 'https://cdn-icons-png.flaticon.com/512/2107/2107957.png'; // Estrella llena
+                } else {
+                    star.src = 'https://cdn-icons-png.flaticon.com/512/2107/2107947.png'; // Estrella vacía
+                }
+            });
+        }
+
+        // Manejar el envío del formulario
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar el comportamiento por defecto del formulario
+
+            // Obtener los datos del formulario
+            const name = document.getElementById('name').value;
+            const rating = selectedRatingInput.value;
+            const opinion = document.getElementById('opinion').value;
+            const image = document.getElementById('image').files[0];
+
+            // Validar entradas
+            if (!name || !rating || !opinion) {
+                alert("Por favor, completa todos los campos antes de enviar tu opinión.");
+                return;
+            }
+
+            // Crear un elemento HTML para la nueva opinión
+            const review = document.createElement('div');
+            review.classList.add('review');
+
+            // Crear estrellas dinámicas
+            const starContainer = document.createElement('div');
+            starContainer.classList.add('rating');
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('img');
+                star.src = i < rating ? 'https://cdn-icons-png.flaticon.com/512/2107/2107957.png' : 'https://cdn-icons-png.flaticon.com/512/2107/2107947.png';
+                star.alt = i < rating ? 'Estrella llena' : 'Estrella vacía';
+                starContainer.appendChild(star);
+            }
+
+            // Mostrar imagen si se sube una
+            const imgElement = image ? `<img src="${URL.createObjectURL(image)}" alt="Imagen de la opinión" style="max-width: 100px; margin-top: 10px;">` : '';
+
+            review.innerHTML = `
+                <h3>${name}</h3>
+                <p>${opinion}</p>
+                ${imgElement}
+            `;
+            review.prepend(starContainer);
+
+            // Agregar la nueva opinión al contenedor
+            reviewsContainer.prepend(review);
+
+            // Limpiar el formulario
+            form.reset();
+            updateRatingStars(0); // Restablecer estrellas
+        });
+    </script>
+</body>
+</html>
+
