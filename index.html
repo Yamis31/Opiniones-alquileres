@@ -54,7 +54,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        .form-group input, .form-group textarea, .form-group select, .form-group button {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -87,16 +87,6 @@
         .review:last-child {
             border-bottom: none;
         }
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        .rating img {
-            width: 30px;
-            height: 30px;
-        }
         footer {
             margin-top: 30px;
             background-color: #4CAF50;
@@ -117,11 +107,13 @@
     </header>
 
     <div class="container">
+        <!-- Introducción -->
         <div class="intro">
-            <img src="https://via.placeholder.com/800x400.png?text=Inmobiliaria" alt="Imagen inmobiliaria">
+            <img src="imagenes/casas.jpg" >
             <p>Bienvenido a nuestra plataforma, donde puedes compartir tus experiencias sobre los alquileres en los que has estado. Deja tu valoración, sube fotos de los lugares y ayuda a otros a encontrar su próximo hogar.</p>
         </div>
 
+        <!-- Formulario -->
         <h2>Deja tu opinión</h2>
         <form id="review-form">
             <div class="form-group">
@@ -129,31 +121,29 @@
                 <input type="text" id="name" name="name" placeholder="Escribe tu nombre" required>
             </div>
             <div class="form-group">
-                <label for="rating">Calificación</label>
-                <div class="rating" id="rating">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 1" data-index="1">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 2" data-index="2">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 3" data-index="3">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 4" data-index="4">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Estrella 5" data-index="5">
-                </div>
-                <input type="hidden" id="selected-rating" name="rating" required>
+                <label for="city">Ciudad</label>
+                <input type="text" id="city" name="city" placeholder="Escribe tu ciudad" required>
+            </div>
+            <div class="form-group">
+                <label for="province">Provincia</label>
+                <input type="text" id="province" name="province" placeholder="Escribe tu provincia" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Dirección</label>
+                <input type="text" id="address" name="address" placeholder="Escribe la dirección del alquiler" required>
             </div>
             <div class="form-group">
                 <label for="opinion">Tu opinión</label>
                 <textarea id="opinion" name="opinion" rows="5" placeholder="Escribe tu opinión" required></textarea>
             </div>
-            <div class="form-group">
-                <label for="image">Sube una foto (opcional)</label>
-                <input type="file" id="image" name="image">
-            </div>
             <button type="submit" class="btn">Enviar opinión</button>
         </form>
 
+        <!-- Sección de opiniones -->
         <div class="reviews">
             <h2>Opiniones recientes</h2>
             <div id="reviews-container">
-                <!-- Las opiniones aparecerán aquí -->
+                <!-- Aquí aparecerán las opiniones -->
             </div>
         </div>
     </div>
@@ -165,78 +155,46 @@
     <script>
         const form = document.getElementById('review-form');
         const reviewsContainer = document.getElementById('reviews-container');
-        const ratingStars = document.querySelectorAll('.rating img');
-        const selectedRatingInput = document.getElementById('selected-rating');
-        
-        let selectedRating = 0;
-        
-        // Manejar el click en las estrellas para la calificación
-        ratingStars.forEach(star => {
-            star.addEventListener('click', function() {
-                selectedRating = parseInt(this.getAttribute('data-index'));
-                updateRatingStars(selectedRating);
-                selectedRatingInput.value = selectedRating; // Almacenar la calificación seleccionada
-            });
-        });
 
-        function updateRatingStars(rating) {
-            ratingStars.forEach((star, index) => {
-                if (index < rating) {
-                    star.src = 'https://cdn-icons-png.flaticon.com/512/2107/2107957.png'; // Estrella llena
-                } else {
-                    star.src = 'https://cdn-icons-png.flaticon.com/512/2107/2107947.png'; // Estrella vacía
-                }
+        // Cargar opiniones al iniciar la página
+        window.onload = loadReviews;
+
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            reviewsContainer.innerHTML = ''; // Limpia el contenedor
+            reviews.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.innerHTML = `
+                    <h3>${review.name}</h3>
+                    <p><strong>Ciudad:</strong> ${review.city}</p>
+                    <p><strong>Provincia:</strong> ${review.province}</p>
+                    <p><strong>Dirección:</strong> ${review.address}</p>
+                    <p>${review.opinion}</p>
+                `;
+                reviewsContainer.appendChild(reviewElement);
             });
         }
 
-        // Manejar el envío del formulario
+        // Guardar nueva opinión
         form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Evitar el comportamiento por defecto del formulario
+            event.preventDefault();
 
-            // Obtener los datos del formulario
             const name = document.getElementById('name').value;
-            const rating = selectedRatingInput.value;
+            const city = document.getElementById('city').value;
+            const province = document.getElementById('province').value;
+            const address = document.getElementById('address').value;
             const opinion = document.getElementById('opinion').value;
-            const image = document.getElementById('image').files[0];
 
-            // Validar entradas
-            if (!name || !rating || !opinion) {
-                alert("Por favor, completa todos los campos antes de enviar tu opinión.");
-                return;
-            }
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            reviews.push({ name, city, province, address, opinion });
+            localStorage.setItem('reviews', JSON.stringify(reviews));
 
-            // Crear un elemento HTML para la nueva opinión
-            const review = document.createElement('div');
-            review.classList.add('review');
-
-            // Crear estrellas dinámicas
-            const starContainer = document.createElement('div');
-            starContainer.classList.add('rating');
-            for (let i = 0; i < 5; i++) {
-                const star = document.createElement('img');
-                star.src = i < rating ? 'https://cdn-icons-png.flaticon.com/512/2107/2107957.png' : 'https://cdn-icons-png.flaticon.com/512/2107/2107947.png';
-                star.alt = i < rating ? 'Estrella llena' : 'Estrella vacía';
-                starContainer.appendChild(star);
-            }
-
-            // Mostrar imagen si se sube una
-            const imgElement = image ? `<img src="${URL.createObjectURL(image)}" alt="Imagen de la opinión" style="max-width: 100px; margin-top: 10px;">` : '';
-
-            review.innerHTML = `
-                <h3>${name}</h3>
-                <p>${opinion}</p>
-                ${imgElement}
-            `;
-            review.prepend(starContainer);
-
-            // Agregar la nueva opinión al contenedor
-            reviewsContainer.prepend(review);
-
-            // Limpiar el formulario
+            // Actualizar vista y limpiar el formulario
+            loadReviews();
             form.reset();
-            updateRatingStars(0); // Restablecer estrellas
         });
     </script>
 </body>
-</html>
 
+</html>
